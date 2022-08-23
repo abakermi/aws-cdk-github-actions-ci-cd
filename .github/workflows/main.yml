@@ -1,0 +1,75 @@
+name: api-stack
+on:
+  push:
+    branches:
+      - master
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: "14"
+
+      # Configure AWS credentials
+      - name: ================= Configure AWS credentials =================
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      # install Npm depd
+      - name: ================= npm install =================
+        working-directory: .
+        env:
+          CI: true
+        run: |
+          pwd
+          npm ci
+          cd lib/functions
+          npm ci
+
+      - name: ================= Unit tests ===================
+        run: |
+          pwd
+          npm run test  
+
+  
+  deploy:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: "14"
+
+      # Configure AWS credentials
+      - name: ================= Configure AWS credentials =================
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      # install Npm depd
+      - name: ================= npm install =================
+        working-directory: .
+        env:
+          CI: true
+        run: |
+          pwd
+          npm ci
+          cd lib/functions
+          npm ci
+
+      - name: ================= Deploy To Aws account =================
+        run: |
+          npx cdk bootstrap
+          npx cdk deploy --require-approval never 
+        env:
+          CDK_DEPLOY_ACCOUNT: ${{ secrets.AWS_DEPLOY_ACCOUNT }}
+          CDK_DEPLOY_REGION: ${{ secrets.AWS_REGION }}
+

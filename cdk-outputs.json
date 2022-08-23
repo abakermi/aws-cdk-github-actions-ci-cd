@@ -1,0 +1,6 @@
+{
+  "ApiGatewayStack": {
+    "apigatewayurl": "https://cir3o47wj1.execute-api.ap-southeast-1.amazonaws.com/prod/",
+    "apigatewayrandomuserEndpoint2E3B1B32": "https://cir3o47wj1.execute-api.ap-southeast-1.amazonaws.com/prod/"
+  }
+}
